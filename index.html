@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>𝐗𝐈𝐑𝐔𝐒 𝐌𝐎𝐃𝐙 | Premium Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-base: #020306;
+            --bg-card: #080b12;
+            --border-color: #151b2b;
+            --neon-pink: #ff0055;
+            --neon-blue: #00f0ff;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: #ffffff;
+            font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Abstract Animated BG */
+        .bg-glow {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at 10% 10%, rgba(0, 240, 255, 0.04) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 90%, rgba(255, 0, 85, 0.04) 0%, transparent 40%);
+            z-index: -1; pointer-events: none;
+        }
+
+        /* Side Navigation (Mobile Drawer) */
+        .sidebar {
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            z-index: 50;
+        }
+        @media (max-width: 767px) {
+            .sidebar { transform: translateX(-100%); position: fixed; top: 0; left: 0; height: 100vh; width: 260px; }
+            .sidebar.open { transform: translateX(0); }
+        }
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+            opacity: 0; visibility: hidden; transition: 0.3s; z-index: 40;
+        }
+        .overlay.open { opacity: 1; visibility: visible; }
+
+        /* Smooth UI Cards */
+        .x-card {
+            background: linear-gradient(160deg, #0a0d17, #05070a);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .x-card:hover {
+            border-color: rgba(0, 240, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 240, 255, 0.08);
+            transform: translateY(-3px);
+        }
+        .x-card-match { border-color: rgba(255, 0, 85, 0.4); box-shadow: 0 0 20px rgba(255, 0, 85, 0.1); }
+        .x-card-match:hover { border-color: var(--neon-pink); box-shadow: 0 8px 25px rgba(255, 0, 85, 0.2); }
+
+        /* Animated Buttons */
+        .btn-neon-pink {
+            background: linear-gradient(90deg, #ff0055, #ff2a75);
+            border-radius: 10px; color: white; border: none;
+            transition: 0.3s; box-shadow: 0 4px 15px rgba(255, 0, 85, 0.25);
+        }
+        .btn-neon-pink:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 0, 85, 0.4); filter: brightness(1.1); }
+        .btn-neon-pink:active { transform: scale(0.96); }
+
+        .btn-neon-blue {
+            background: linear-gradient(90deg, #00b3ff, #00f0ff);
+            border-radius: 10px; color: #020306; border: none; font-weight: 800;
+            transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 240, 255, 0.25);
+        }
+        .btn-neon-blue:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 240, 255, 0.4); filter: brightness(1.1); }
+
+        .btn-dark {
+            background: #0f1423; border: 1px solid var(--border-color);
+            border-radius: 10px; color: #a1a1aa; transition: 0.3s;
+        }
+        .btn-dark:hover:not(:disabled) { background: #151b2b; color: white; border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+        .btn-dark:active:not(:disabled) { transform: scale(0.96); }
+
+        /* RECTANGULAR SMOOTH TOGGLE */
+        .rect-toggle {
+            display: flex; background: #05060a; border-radius: 6px;
+            border: 1px solid var(--border-color); position: relative;
+            cursor: pointer; width: 100%; height: 30px;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
+        }
+        .rect-btn { flex: 1; text-align: center; line-height: 28px; font-size: 11px; font-weight: 800; z-index: 2; transition: color 0.3s; }
+        .rect-slider {
+            position: absolute; top: 1px; bottom: 1px; width: calc(50% - 2px);
+            border-radius: 4px; transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 1;
+        }
+        .mode-br-active { transform: translateX(1px); background: rgba(255, 0, 85, 0.2); border: 1px solid var(--neon-pink); box-shadow: 0 0 10px rgba(255,0,85,0.3); }
+        .mode-lw-active { transform: translateX(calc(100% + 1px)); background: rgba(0, 240, 255, 0.2); border: 1px solid var(--neon-blue); box-shadow: 0 0 10px rgba(0,240,255,0.3); }
+
+        /* Level Badge */
+        .level-badge {
+            background: rgba(0, 240, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            color: var(--neon-blue);
+            box-shadow: inset 0 0 8px rgba(0,240,255,0.1);
+            border-radius: 6px; padding: 2px 8px; font-size: 10px; font-weight: 800; letter-spacing: 1px;
+        }
+
+        /* Nav Item Styles */
+        .nav-item { cursor: pointer; transition: 0.3s; color: #6b7280; border-left: 3px solid transparent; }
+        .nav-item.active { background: rgba(0, 240, 255, 0.05); color: var(--neon-blue); border-left-color: var(--neon-blue); }
+        .nav-item:hover:not(.active) { color: white; background: rgba(255,255,255,0.02); }
+
+        /* Page Routing */
+        .page-section { display: none; height: 100%; overflow-y: auto; padding-bottom: 50px; animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .page-section.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Progress Bar */
+        .prog-bg { background: #0f1423; height: 4px; border-radius: 4px; width: 100%; overflow: hidden; }
+        .prog-fill { height: 100%; transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); border-radius: 4px; }
+        .prog-blue { background: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); }
+        .prog-pink { background: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1a202f; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-blue); }
+
+        .stylish-font { font-family: 'Cinzel', serif; letter-spacing: 1px; }
+
+        /* Fast Modals */
+        .modal-bg { background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 100; opacity: 0; visibility: hidden; transition: 0.2s; }
+        .modal-bg.active { opacity: 1; visibility: visible; }
+        .modal-content { transform: scale(0.95) translateY(10px); transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .modal-bg.active .modal-content { transform: scale(1) translateY(0); }
+    </style>
+
+
+    <!-- SOLO LEVELING INSPIRED UI OVERRIDES: VISUAL ONLY -->
+    <style>
+        :root {
+            --bg-base:#07060d;
+            --bg-card:#0f0d18;
+            --border-color:#242036;
+            --neon-purple:#b86cff;
+            --neon-purple-2:#7c3aed;
+            --neon-soft:#d8b4fe;
+            --neon-cyan:#bda4ff;
+        }
+        body {
+            background:
+                radial-gradient(circle at 15% 10%, rgba(168,85,247,.10), transparent 30%),
+                radial-gradient(circle at 90% 20%, rgba(124,58,237,.08), transparent 28%),
+                #07060d !important;
+            color:#f5f1ff !important;
+        }
+        .bg-glow {
+            background:
+                radial-gradient(circle at 12% 12%, rgba(192,132,252,.10), transparent 34%),
+                radial-gradient(circle at 86% 82%, rgba(124,58,237,.08), transparent 34%) !important;
+        }
+
+        /* Desktop navigation becomes a clean premium top bar. */
+        @media (min-width:768px){
+            body{display:flex !important; flex-direction:column !important;}
+            .sidebar{
+                width:100% !important; height:74px !important; min-height:74px !important;
+                flex-direction:row !important; align-items:center !important;
+                border-right:0 !important; border-bottom:1px solid #211b30 !important;
+                background:rgba(9,8,15,.90) !important;
+                backdrop-filter:blur(22px) !important;
+                box-shadow:0 8px 30px rgba(0,0,0,.25);
+            }
+            .sidebar > div:first-child{
+                padding:12px 24px !important; border-bottom:0 !important;
+                border-right:1px solid #211b30 !important; min-width:205px;
+            }
+            .sidebar > div:first-child .w-12{
+                width:40px !important;height:40px !important;border-radius:12px !important;
+                background:linear-gradient(135deg,#c084fc,#7c3aed) !important;
+                box-shadow:0 0 24px rgba(168,85,247,.35) !important;
+            }
+            .sidebar > div:nth-child(2){
+                flex-direction:row !important; align-items:center !important;
+                padding:0 14px !important; gap:6px !important;
+            }
+            .sidebar > div:nth-child(2) .nav-item{
+                border-left:0 !important; border-bottom:2px solid transparent;
+                border-radius:12px !important; padding:10px 14px !important;
+            }
+            .sidebar > div:nth-child(2) .nav-item.active{
+                background:rgba(168,85,247,.10) !important;
+                color:#d8b4fe !important; border-bottom-color:#b86cff !important;
+                box-shadow:inset 0 -1px 0 rgba(216,180,254,.18);
+            }
+            .sidebar > div:nth-child(2) .nav-item .icon-box{
+                color:#b86cff !important; background:#131020 !important; border-color:#29223a !important;
+            }
+            .sidebar > div:nth-child(3){
+                margin-left:auto; border-top:0 !important; padding:10px 18px !important;
+                display:flex; align-items:center; gap:10px;
+            }
+            .sidebar > div:nth-child(3) > div{
+                margin-bottom:0 !important; background:#11101a !important;
+                border-color:#29223a !important; padding:7px 10px !important;
+            }
+            .sidebar > div:nth-child(3) .w-10{width:34px !important;height:34px !important;color:#c084fc !important;}
+            .sidebar > div:nth-child(3) button{width:auto !important; padding:9px 12px !important;}
+            main{width:100% !important; min-height:calc(100vh - 74px) !important;}
+        }
+
+        .x-card{
+            background:linear-gradient(145deg,rgba(20,17,31,.98),rgba(10,9,16,.98)) !important;
+            border:1px solid #282139 !important;
+            border-radius:20px !important;
+            box-shadow:0 10px 35px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.025) !important;
+        }
+        .x-card:hover{
+            border-color:rgba(184,108,255,.45) !important;
+            box-shadow:0 14px 42px rgba(124,58,237,.13),0 0 0 1px rgba(184,108,255,.08) !important;
+            transform:translateY(-2px);
+        }
+        .x-card-match{
+            border-color:rgba(184,108,255,.45) !important;
+            box-shadow:0 0 25px rgba(168,85,247,.12) !important;
+        }
+
+        .btn-neon-pink,.btn-neon-blue{
+            background:linear-gradient(135deg,#c084fc,#8b5cf6) !important;
+            color:#fff !important;
+            border:1px solid rgba(216,180,254,.25) !important;
+            box-shadow:0 7px 24px rgba(139,92,246,.24) !important;
+            border-radius:12px !important;
+        }
+        .btn-neon-pink:hover,.btn-neon-blue:hover{
+            box-shadow:0 10px 30px rgba(168,85,247,.38) !important;
+        }
+        .btn-dark{
+            background:#13111d !important; border:1px solid #29223a !important;
+            color:#aaa2bd !important; border-radius:12px !important;
+        }
+        .btn-dark:hover:not(:disabled){
+            background:#1a1627 !important; color:#fff !important;
+            border-color:rgba(184,108,255,.42) !important;
+        }
+
+        /* Purple-ify existing blue/pink utility colors without touching logic. */
+        *[class*="text-[#ff0055]"]{color:#c084fc !important;}
+        *[class*="text-[#00f0ff]"]{color:#c4b5fd !important;}
+        *[class*="text-[#00ff88]"]{color:#c4b5fd !important;}
+        *[class*="text-[#ffaa00]"]{color:#d8b4fe !important;}
+        *[class*="border-[#ff0055]"]{border-color:rgba(192,132,252,.55) !important;}
+        *[class*="border-[#00f0ff]"]{border-color:rgba(196,181,253,.40) !important;}
+        *[class*="bg-[#00f0ff]"]{background:#c4b5fd !important; color:#151020 !important;}
+        *[class*="bg-[#ff0055]"]{background:#8b5cf6 !important;}
+        *[class*="from-[#ff0055]"]{--tw-gradient-from:#c084fc !important;}
+        *[class*="to-[#4a00e0]"]{--tw-gradient-to:#6d28d9 !important;}
+
+        .level-badge{
+            background:rgba(168,85,247,.08) !important;
+            border-color:rgba(192,132,252,.38) !important;
+            color:#d8b4fe !important;
+        }
+        .prog-blue,.prog-pink{background:linear-gradient(90deg,#8b5cf6,#d8b4fe) !important;box-shadow:0 0 12px rgba(168,85,247,.55) !important;}
+        .prog-bg{background:#171323 !important;}
+
+        .page-section{padding-top:26px !important;}
+        #page-dashboard{background:transparent;}
+        #page-dashboard > div:first-child .x-card{
+            min-height:86px; display:flex; flex-direction:column; justify-content:center;
+        }
+        #page-dashboard > div:first-child .x-card p:last-child{
+            text-shadow:0 0 16px rgba(192,132,252,.18);
+        }
+        #page-dashboard h2,.page-section h2{
+            letter-spacing:2px !important;
+        }
+        #searchInput{
+            background:#11101a !important; border-color:#29223a !important;
+            border-radius:14px !important;
+        }
+        #searchInput:focus{border-color:#a855f7 !important;box-shadow:0 0 0 3px rgba(168,85,247,.08) !important;}
+
+        .rect-toggle{background:#0d0b14 !important;border-color:#29223a !important;}
+        .mode-br-active,.mode-lw-active{
+            background:rgba(168,85,247,.12) !important;
+            border-color:#a855f7 !important;
+            box-shadow:0 0 14px rgba(168,85,247,.25) !important;
+        }
+        .modal-bg{background:rgba(4,3,8,.78) !important;backdrop-filter:blur(12px) !important;}
+        .modal-content{box-shadow:0 25px 80px rgba(0,0,0,.55),0 0 35px rgba(124,58,237,.10) !important;}
+        input,select,textarea{background:#0c0a12 !important;border-color:#29223a !important;}
+        input:focus,select:focus,textarea:focus{border-color:#a855f7 !important;box-shadow:0 0 0 3px rgba(168,85,247,.08) !important;}
+        #logs-container{color:#cfc8dd !important;}
+        ::-webkit-scrollbar-thumb{background:#302741 !important;}
+        ::-webkit-scrollbar-thumb:hover{background:#9b5de5 !important;}
+
+        @media(max-width:767px){
+            .sidebar{background:rgba(10,8,16,.97) !important;border-right-color:#29223a !important;}
+            .sidebar > div:first-child{border-bottom-color:#29223a !important;}
+            .sidebar > div:nth-child(2) .nav-item.active{background:rgba(168,85,247,.10) !important;color:#d8b4fe !important;border-left-color:#b86cff !important;}
+            .sidebar > div:nth-child(2) .nav-item .icon-box{color:#c084fc !important;}
+            .sidebar > div:nth-child(3){border-top-color:#29223a !important;}
+            .page-section{padding:16px !important;}
+        }
+    </style>
+
+</head>
+<body class="flex h-screen relative">
+
+    <div class="bg-glow"></div>
+    <div class="overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar (Desktop & Mobile Slide-in) -->
+    <aside class="sidebar bg-[#04060a]/95 backdrop-blur-xl border-r border-[#151b2b] flex flex-col shrink-0 w-64 md:w-72" id="sidebar">
+        <!-- Brand -->
+        <div class="p-6 md:p-8 border-b border-[#151b2b] flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#ff0055] to-[#4a00e0] flex items-center justify-center shadow-[0_0_20px_rgba(255,0,85,0.4)]">
+                <i class="fa-solid fa-bolt text-white text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold tracking-widest leading-none stylish-font">𝐗𝐈𝐑𝐔𝐒</h1>
+                <h1 class="text-2xl font-bold tracking-widest text-[#ff0055] leading-none stylish-font">𝐌𝐎𝐃𝐙</h1>
+            </div>
+        </div>
+        
+        <!-- Links -->
+        <div class="flex-1 py-6 flex flex-col gap-2 px-3">
+            <div class="nav-item active px-4 py-3 rounded-lg flex items-center gap-3 font-bold cursor-pointer transition-all hover:bg-white/5" onclick="navigate('dashboard', this)">
+                <div class="w-8 h-8 rounded-md bg-[#0a0d17] border border-[#151b2b] flex items-center justify-center text-[#00f0ff] icon-box"><i class="fa-solid fa-gamepad"></i></div> 
+                <span class="tracking-wider">Dashboard</span>
+            </div>
+            <div class="nav-item px-4 py-3 rounded-lg flex items-center gap-3 font-bold cursor-pointer transition-all hover:bg-white/5" onclick="navigate('harvesters', this)">
+                <div class="w-8 h-8 rounded-md bg-[#0a0d17] border border-[#151b2b] flex items-center justify-center icon-box"><i class="fa-solid fa-trophy"></i></div> 
+                <span class="tracking-wider">Harvesters</span>
+            </div>
+            <div class="nav-item px-4 py-3 rounded-lg flex items-center gap-3 font-bold cursor-pointer transition-all hover:bg-white/5" onclick="navigate('logs', this)">
+                <div class="w-8 h-8 rounded-md bg-[#0a0d17] border border-[#151b2b] flex items-center justify-center icon-box"><i class="fa-solid fa-terminal"></i></div> 
+                <span class="tracking-wider">Live Logs</span>
+            </div>
+        </div>
+
+        <!-- User Profile -->
+        <div class="p-5 border-t border-[#151b2b]">
+            <div class="flex items-center gap-3 mb-4 bg-[#0a0d17] p-3 rounded-xl border border-[#151b2b]">
+                <div class="w-10 h-10 rounded-lg bg-[#121824] flex justify-center items-center text-[#00f0ff] border border-[#151b2b]"><i class="fa-solid fa-user"></i></div>
+                <div class="overflow-hidden">
+                    <p class="text-[10px] text-[#ff0055] uppercase font-bold tracking-widest" id="desk-role">USER</p>
+                    <p class="text-sm font-bold text-white truncate" id="desk-user">@username</p>
+                </div>
+            </div>
+            <button onclick="logout()" class="w-full btn-dark py-3 rounded-xl font-bold text-red-500 tracking-widest"><i class="fa-solid fa-power-off mr-2"></i> LOGOUT</button>
+        </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 flex flex-col h-full relative z-10 w-full overflow-hidden">
+        
+        <!-- Mobile Header -->
+        <header class="md:hidden flex justify-between items-center p-4 bg-[#020306]/80 backdrop-blur-md border-b border-[#151b2b] shrink-0">
+            <button onclick="toggleSidebar()" class="text-gray-300 hover:text-white text-xl"><i class="fa-solid fa-bars"></i></button>
+            <h1 class="text-xl font-bold tracking-widest stylish-font">𝐗𝐈𝐑𝐔𝐒 <span class="text-[#ff0055]">𝐌𝐎𝐃𝐙</span></h1>
+            <div class="w-6"></div> <!-- Spacer -->
+        </header>
+
+        <!-- Dynamic Pages -->
+        <div class="flex-1 overflow-hidden relative">
+            
+            <!-- DASHBOARD -->
+            <section id="page-dashboard" class="page-section active p-4 md:p-6 lg:p-8">
+                
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-2 lg:grid-cols-6 gap-3 mb-6">
+                    <div class="x-card p-4 text-center"><p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">Accounts</p><p class="text-2xl font-bold text-[#ff0055]" id="stat-acc">0</p></div>
+                    <div class="x-card p-4 text-center"><p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">Online</p><p class="text-2xl font-bold text-[#00f0ff]" id="stat-online">0</p></div>
+                    <div class="x-card p-4 text-center"><p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">In Match</p><p class="text-2xl font-bold text-[#00f0ff]" id="stat-match">0</p></div>
+                    <div class="x-card p-4 text-center"><p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">Total EXP</p><p class="text-2xl font-bold text-[#ff0055]" id="stat-exp">+0</p></div>
+                    <div class="x-card p-4 text-center"><p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">Matches</p><p class="text-2xl font-bold text-white" id="stat-matches">0</p></div>
+                    <div class="x-card p-4 text-center"><p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">Uptime</p><p class="text-2xl font-bold text-[#00f0ff]" id="stat-uptime">00:00:00</p></div>
+                </div>
+
+                <!-- Action Header (Add & Bulk side-by-side) -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                    <h2 class="text-xl font-bold tracking-widest text-white uppercase stylish-font">MANAGER <span class="text-[#ff0055]">/ 𝐗𝐈𝐑𝐔𝐒 𝐌𝐎𝐃𝐙</span></h2>
+                    
+                    <div class="flex flex-wrap md:flex-nowrap gap-3 w-full md:w-auto">
+                        <button onclick="openModal('addModal')" class="flex-1 md:flex-none btn-neon-pink px-5 py-3 font-bold tracking-widest text-xs flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> 𝐀𝐃𝐃 𝐈𝐃
+                        </button>
+                        <!-- Bulk Upload (Only Admin) -->
+                        <button onclick="openModal('bulkModal')" id="btn-bulk-main" class="hidden flex-1 md:flex-none btn-neon-blue px-5 py-3 font-bold tracking-widest text-xs flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> IMPORT
+                        </button>
+                        
+                        <div class="relative w-full md:w-64">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                            <input type="text" id="searchInput" onkeyup="renderAccounts()" class="w-full bg-[#0a0d17] border border-[#151b2b] text-white pl-9 pr-4 py-3 rounded-xl text-xs focus:outline-none focus:border-[#00f0ff] transition shadow-inner" placeholder="Search UID...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accounts Grid -->
+                <div id="accounts-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    <div class="col-span-full text-center py-20 flex flex-col items-center"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-[#00f0ff] mb-4"></i><span class="text-gray-500 tracking-widest font-bold">LOADING SYSTEM...</span></div>
+                </div>
+            </section>
+
+            <!-- HARVESTERS -->
+            <section id="page-harvesters" class="page-section p-4 md:p-8">
+                <h2 class="text-xl font-bold tracking-widest text-white uppercase mb-6 stylish-font"><i class="fa-solid fa-trophy text-[#00f0ff] mr-2"></i> LEADERBOARD <span class="text-[#ff0055]">/ 𝐗𝐈𝐑𝐔𝐒 𝐌𝐎𝐃𝐙</span></h2>
+                <div class="x-card p-2 md:p-4">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left whitespace-nowrap">
+                            <thead class="text-[10px] text-gray-500 uppercase tracking-widest border-b border-[#151b2b]">
+                                <tr><th class="pb-3 px-3 w-12 text-center">#</th><th class="pb-3 px-3">Account Data</th><th class="pb-3 px-3 text-center">Level</th><th class="pb-3 px-3 text-right">Gained</th></tr>
+                            </thead>
+                            <tbody class="text-sm" id="harvesters-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LOGS -->
+            <section id="page-logs" class="page-section p-4 md:p-8 flex flex-col">
+                <div class="flex justify-between items-center mb-6 shrink-0">
+                    <h2 class="text-xl font-bold tracking-widest text-white uppercase stylish-font"><i class="fa-solid fa-terminal text-[#00f0ff] mr-2"></i> SYSTEM <span class="text-[#ff0055]">LOGS</span></h2>
+                    <button onclick="clearLogs()" class="btn-dark px-4 py-2 text-xs font-bold text-red-400 hover:text-red-500 tracking-widest"><i class="fa-solid fa-eraser mr-2"></i>CLEAR</button>
+                </div>
+                <div class="x-card p-4 flex-1 overflow-hidden">
+                    <div id="logs-container" class="h-full overflow-y-auto font-mono text-[10px] sm:text-xs text-gray-300 space-y-2 pr-2"></div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- MODALS -->
+    <!-- Add Modal -->
+    <div id="addModal" class="fixed inset-0 modal-bg flex items-center justify-center px-4">
+        <div class="x-card w-full max-w-sm p-6 modal-content border-t-2 border-[#ff0055]">
+            <button onclick="closeModal('addModal')" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-[#0a0d17] border border-[#151b2b] flex items-center justify-center text-gray-400 hover:text-white transition active:scale-95"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="font-bold mb-6 text-white uppercase tracking-widest text-lg stylish-font">Connect New 𝐘</h3>
+            
+            <div class="space-y-4 mb-6">
+                <div class="relative">
+                    <i class="fa-solid fa-id-badge absolute left-4 top-1/2 transform -translate-y-1/2 text-[#00f0ff]"></i>
+                    <input type="text" id="add-uid" class="w-full bg-[#05060a] border border-[#151b2b] rounded-xl pl-10 pr-4 py-3.5 text-white focus:outline-none focus:border-[#ff0055] transition shadow-inner text-sm font-bold tracking-widest" placeholder="GAME UID">
+                </div>
+                <div class="relative">
+                    <i class="fa-solid fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-[#00f0ff]"></i>
+                    <input type="password" id="add-pwd" class="w-full bg-[#05060a] border border-[#151b2b] rounded-xl pl-10 pr-4 py-3.5 text-white focus:outline-none focus:border-[#ff0055] transition shadow-inner text-sm font-bold tracking-widest" placeholder="PASSWORD">
+                </div>
+            </div>
+            <button onclick="submitAdd()" id="btnAddSubmit" class="w-full btn-neon-pink py-3.5 font-bold tracking-widest text-sm">ADD 𝐘</button>
+        </div>
+    </div>
+
+    <!-- Bulk Modal -->
+    <div id="bulkModal" class="fixed inset-0 modal-bg flex items-center justify-center px-4">
+        <div class="x-card w-full max-w-sm p-6 modal-content border-t-2 border-[#00f0ff]">
+            <button onclick="closeModal('bulkModal')" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-[#0a0d17] border border-[#151b2b] flex items-center justify-center text-gray-400 hover:text-white transition active:scale-95"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="font-bold mb-2 text-white uppercase tracking-widest text-lg stylish-font">Bulk Import ʏ</h3>
+            <p class="text-[10px] text-gray-400 mb-6 tracking-wider font-bold">Admin Only: Select JSON File</p>
+            
+            <label class="block border-2 border-dashed border-[#151b2b] hover:border-[#00f0ff] bg-[#05060a] p-10 text-center rounded-2xl cursor-pointer transition-all mb-6 group shadow-inner">
+                <i class="fa-solid fa-file-code text-4xl text-[#00f0ff] mb-3 group-hover:scale-110 transition-transform"></i>
+                <div class="text-sm font-bold text-gray-200 tracking-widest mb-2">TAP TO CHOOSE</div>
+                <div id="file-name" class="text-[9px] text-[#ff0055] font-bold bg-[#0a0d17] inline-block px-3 py-1 rounded-full border border-[#151b2b] uppercase tracking-widest">No file chosen</div>
+                <input type="file" id="json-upload" accept=".json" class="hidden" onchange="document.getElementById('file-name').innerText = this.files[0] ? this.files[0].name : 'No file chosen'">
+            </label>
+            <button onclick="submitBulkJson()" id="btnBulkSubmit" class="w-full btn-neon-blue py-3.5 tracking-widest text-sm uppercase">Start Import</button>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="detailsModal" class="fixed inset-0 modal-bg flex items-center justify-center px-4">
+        <div class="x-card w-full max-w-sm p-6 modal-content border-t-2 border-[#ff0055]">
+            <button onclick="closeModal('detailsModal')" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-[#0a0d17] border border-[#151b2b] flex items-center justify-center text-gray-400 hover:text-white transition active:scale-95"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="text-center mb-6 pt-2">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#ff0055] to-[#4a00e0] mx-auto mb-3 flex items-center justify-center text-2xl font-bold shadow-[0_0_20px_rgba(255,0,85,0.4)]">
+                    <i class="fa-solid fa-user-astronaut"></i>
+                </div>
+                <h3 class="font-bold text-white tracking-widest text-lg stylish-font" id="det-uid">UID</h3>
+                <p class="text-[10px] text-gray-400 uppercase tracking-widest" id="det-nick">Nickname</p>
+            </div>
+            
+            <div id="det-content" class="bg-[#05060a] border border-[#151b2b] rounded-xl p-4 space-y-3 text-sm shadow-inner font-bold tracking-wide"></div>
+        </div>
+    </div>
+
+    <script>
+        // Data State
+        let currentUser = null;
+        let userRole = 'user';
+        let allAccounts = [];
+        let myUids = [];
+
+        // SweetAlert
+        const Toast = Swal.mixin({
+            toast: true, position: 'top-end', showConfirmButton: false, timer: 2500,
+            background: '#0a0d17', color: '#fff',
+            customClass: { popup: 'border border-[#151b2b] rounded-2xl shadow-2xl' }
+        });
+
+        // Mobile Sidebar Logic
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebar-overlay');
+            sb.classList.toggle('open');
+            ov.classList.toggle('open');
+        }
+
+        async function init() {
+            try {
+                const res = await fetch('/api/me');
+                if(!res.ok) throw new Error();
+                const data = await res.json();
+                if(!data.logged_in) throw new Error();
+                
+                currentUser = data.username;
+                userRole = data.role;
+                
+                document.getElementById('desk-user').innerText = `@${currentUser}`;
+                if(userRole === 'admin') {
+                    // Show Bulk Import button on main dashboard for Admin
+                    document.getElementById('btn-bulk-main').classList.remove('hidden');
+                    document.getElementById('desk-role').innerText = 'ADMIN 🤫';
+                }
+
+                fetchStats();
+                fetchLogs();
+                setInterval(fetchStats, 5000);
+                setInterval(fetchLogs, 3000);
+            } catch (err) { window.location.href = '/login'; }
+        }
+
+        // Animated Routing
+        function navigate(page, btnEl) {
+            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`page-${page}`).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active', 'bg-white/5');
+                el.children[0].classList.remove('text-[#00f0ff]');
+            });
+            
+            if(btnEl && btnEl.classList.contains('nav-item')) {
+                btnEl.classList.add('active', 'bg-white/5');
+                btnEl.children[0].classList.add('text-[#00f0ff]');
+            }
+
+            if(window.innerWidth < 768) toggleSidebar(); // Close sidebar on mobile after click
+        }
+
+        async function fetchStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                if(data.status === 'success') {
+                    allAccounts = data.accounts;
+                    myUids = allAccounts.filter(a => a.owner === currentUser).map(a => a.uid);
+                    
+                    let online = 0, match = 0;
+                    data.accounts.forEach(acc => {
+                        if(!acc.is_paused) online++;
+                        if(acc.status.includes('MATCH') || acc.active_matches > 0) match++;
+                    });
+                    
+                    document.getElementById('stat-acc').innerHTML = `${data.total_accounts}<span class="text-sm text-gray-600">/${userRole==='admin'?'∞':'10'}</span>`;
+                    document.getElementById('stat-online').innerText = online;
+                    document.getElementById('stat-match').innerText = match;
+                    document.getElementById('stat-exp').innerText = `+${data.total_gained_exp.toLocaleString()}`;
+                    document.getElementById('stat-matches').innerText = data.total_matches;
+                    
+                    const s = data.uptime;
+                    document.getElementById('stat-uptime').innerText = `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor((s%3600)/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+                    
+                    renderAccounts();
+                    renderHarvesters(data.accounts);
+                }
+            } catch (e) {}
+        }
+
+        function renderAccounts() {
+            const container = document.getElementById('accounts-grid');
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allAccounts.filter(acc => acc.uid.toLowerCase().includes(term) || (acc.nickname && acc.nickname.toLowerCase().includes(term)));
+
+            if(filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-20 text-gray-500 tracking-widest font-bold uppercase"><i class="fa-solid fa-folder-open text-4xl mb-4 opacity-30"></i><br>NO ACCOUNTS FOUND</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(acc => {
+                // Real data logic
+                const isBR = acc.mode === 'BR';
+                const isPaused = acc.is_paused || acc.status === 'PAUSED';
+                const inMatch = acc.status.includes('MATCH') || acc.active_matches > 0;
+                const pct = acc.progress_pct || 0;
+                
+                let badge = '', border = '', pColor = 'prog-blue';
+                if(isPaused) badge = `<div class="px-2 py-0.5 rounded-lg border border-[#ffaa00]/30 bg-[#ffaa00]/10 text-[#ffaa00] text-[9px] font-bold tracking-widest"><i class="fa-solid fa-pause"></i> PAUSE</div>`;
+                else if(inMatch) { badge = `<div class="px-2 py-0.5 rounded-lg border border-[#ff0055]/40 bg-[#ff0055]/10 text-[#ff0055] text-[9px] font-bold tracking-widest shadow-[0_0_8px_rgba(255,0,85,0.2)]"><i class="fa-solid fa-crosshairs fa-spin"></i> MATCH</div>`; border = 'x-card-match'; pColor = 'prog-pink'; }
+                else badge = `<div class="px-2 py-0.5 rounded-lg border border-[#00f0ff]/30 bg-[#00f0ff]/10 text-[#00f0ff] text-[9px] font-bold tracking-widest"><i class="fa-solid fa-radar fa-spin"></i> SEARCH</div>`;
+
+                let canDelete = userRole === 'admin';
+                let lastExp = acc.last_match_time ? `Last: ${acc.last_match_time}` : (acc.last_updated ? `Sync: ${acc.last_updated}` : 'Waiting...');
+
+                return `
+                <div class="x-card p-4 flex flex-col ${border}">
+                    <!-- Card Header -->
+                    <div class="flex justify-between items-center mb-5">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-fingerprint text-[#00f0ff] opacity-60"></i>
+                            <span class="text-[10px] font-bold tracking-widest text-[#ff0055]">UID ${acc.uid}</span>
+                        </div>
+                        ${badge}
+                    </div>
+
+                    <!-- Profile & New Level Badge -->
+                    <div class="flex items-center gap-4 mb-5">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#ff0055] to-[#4a00e0] flex items-center justify-center text-xl font-bold shadow-[0_0_15px_rgba(255,0,85,0.3)] shrink-0">
+                            ${(acc.nickname && acc.nickname.length>0)?acc.nickname[0].toUpperCase():'X'}
+                        </div>
+                        <div class="overflow-hidden flex-1">
+                            <h3 class="font-bold text-sm text-white truncate mb-1">${acc.nickname || 'XIRUS_USER'}</h3>
+                            <div class="flex items-center gap-2">
+                                <span class="level-badge">LV ${acc.level}</span>
+                                <span class="text-[9px] text-gray-500 uppercase tracking-widest font-bold"><i class="fa-solid fa-user-tag text-[#ff0055]"></i> ${acc.owner}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="grid grid-cols-3 text-center mb-4 bg-[#05060a] rounded-xl border border-[#151b2b] p-2.5 shadow-inner">
+                        <div class="border-r border-[#151b2b]"><p class="text-[8px] text-gray-500 font-bold mb-1 uppercase tracking-widest">Initial</p><p class="text-xs font-bold text-white tracking-wider">${(acc.initial_exp||0).toLocaleString()}</p></div>
+                        <div class="border-r border-[#151b2b]"><p class="text-[8px] text-gray-500 font-bold mb-1 uppercase tracking-widest">Current</p><p class="text-xs font-bold text-white tracking-wider">${(acc.current_exp||0).toLocaleString()}</p></div>
+                        <div><p class="text-[8px] text-gray-500 font-bold mb-1 uppercase tracking-widest">Gained</p><p class="text-xs font-bold text-[#00ff88] tracking-wider">+${(acc.gained_exp||0).toLocaleString()}</p></div>
+                    </div>
+
+                    <!-- Progress -->
+                    <div class="mb-5">
+                        <div class="flex justify-between text-[9px] text-gray-400 mb-2 font-bold tracking-widest uppercase"><span>LVL ${acc.level} &rarr; ${acc.next_level}</span><span>${(acc.needed_for_level-acc.earned_in_level).toLocaleString()} LEFT</span></div>
+                        <div class="prog-bg mb-2"><div class="prog-fill ${pColor}" style="width: ${pct}%;"></div></div>
+                        <div class="flex justify-between text-[8px] text-gray-500 font-bold tracking-widest"><span>${(acc.earned_in_level).toLocaleString()} / ${(acc.needed_for_level).toLocaleString()}</span><span class="${inMatch?'text-[#ff0055]':'text-[#00f0ff]'}">${pct}%</span></div>
+                    </div>
+
+                    <!-- RECTANGULAR TOGGLE (State Persists) -->
+                    <div class="flex items-center justify-between mt-auto mb-4 gap-3">
+                        <div class="w-24 rect-toggle" onclick="switchMode('${acc.uid}', '${isBR?'LONE_WOLF':'BR'}')">
+                            <!-- JS binds the slider pos to isBR -->
+                            <div class="rect-slider ${isBR?'mode-br-active':'mode-lw-active'}"></div>
+                            <div class="rect-btn ${isBR?'text-[#ff0055]':'text-gray-600'}">BR</div>
+                            <div class="rect-btn ${!isBR?'text-[#00f0ff]':'text-gray-600'}">LW</div>
+                        </div>
+                        <div class="text-[9px] text-gray-400 font-bold tracking-widest uppercase"><i class="fa-regular fa-clock text-[#00f0ff]"></i> ${lastExp}</div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex gap-2">
+                        <button onclick="openDetails('${acc.uid}', '${acc.nickname||''}')" class="btn-dark flex-1 py-2.5 rounded-xl text-[10px] font-bold"><i class="fa-solid fa-list-ul"></i></button>
+                        <button onclick="togglePause('${acc.uid}')" class="btn-dark flex-[2] py-2.5 rounded-xl text-[10px] font-bold tracking-widest uppercase ${isPaused?'text-[#00ff88]':'text-[#ffaa00]'}"><i class="fa-solid ${isPaused?'fa-play':'fa-pause'} mr-1"></i> ${isPaused?'PLAY':'PAUSE'}</button>
+                        <button onclick="deleteAcc('${acc.uid}')" class="btn-dark flex-1 py-2.5 rounded-xl text-[10px] font-bold ${canDelete?'text-red-500':'text-gray-600'}" ${!canDelete?'disabled':''}><i class="fa-solid ${canDelete?'fa-trash':'fa-lock'}"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // Harvesters Table
+        function renderHarvesters(accounts) {
+            const sorted = [...accounts].sort((a,b) => (b.gained_exp||0) - (a.gained_exp||0));
+            document.getElementById('harvesters-body').innerHTML = sorted.map((acc, i) => {
+                let rIcon = i===0 ? '<i class="fa-solid fa-crown text-yellow-500 text-xl drop-shadow-[0_0_10px_yellow]"></i>' : i===1 ? '<i class="fa-solid fa-medal text-gray-300 text-lg"></i>' : i===2 ? '<i class="fa-solid fa-medal text-amber-600 text-lg"></i>' : `<span class="text-gray-500 font-bold px-2">${i+1}</span>`;
+                let lvBadge = acc.level >= 21 ? `<span class="bg-gradient-to-r from-[#ff0055] to-[#00f0ff] text-white px-2 py-1 rounded-md text-[9px] font-bold shadow-[0_0_10px_rgba(255,0,85,0.4)] tracking-widest">MAX 21+</span>` : `<span class="bg-[#05060a] text-[#00f0ff] px-2 py-1 rounded-md text-[9px] font-bold border border-[#00f0ff]/30 tracking-widest">LV ${acc.level}</span>`;
+                return `<tr class="border-b border-[#151b2b]/50 hover:bg-[#080b12] transition-colors"><td class="py-3.5 px-3 text-center">${rIcon}</td><td class="py-3.5 px-3"><div class="font-bold text-white text-sm tracking-wider">${acc.uid}</div><div class="text-[9px] text-gray-500 uppercase tracking-widest">${acc.nickname||'XIRUS 𝐘'}</div></td><td class="py-3.5 px-3 text-center">${lvBadge}</td><td class="py-3.5 px-3 text-right text-[#00ff88] font-bold text-sm font-mono">+${(acc.gained_exp||0).toLocaleString()}</td></tr>`;
+            }).join('');
+        }
+
+        // Secure Logs
+        async function fetchLogs() {
+            try {
+                const res = await fetch('/api/logs');
+                const data = await res.json();
+                if(data.logs) {
+                    const c = document.getElementById('logs-container');
+                    const isAtBottom = c.scrollHeight - c.clientHeight <= c.scrollTop + 20;
+                    
+                    let html = '';
+                    data.logs.forEach(l => {
+                        if(userRole === 'admin' || !l.uid || myUids.includes(l.uid)) {
+                            let color = l.level==='error'?'text-[#ff0055]':l.level==='success'?'text-[#00ff88]':l.level==='warning'?'text-[#ffaa00]':'text-[#00f0ff]';
+                            html += `<div class="mb-1.5 border-b border-[#151b2b]/40 pb-1.5"><span class="text-gray-600 font-bold tracking-wider">[${l.time}]</span> ${l.uid?`<span class="text-[#020306] bg-[#00f0ff] text-[9px] font-bold px-1.5 py-0.5 rounded mx-1.5">${l.uid}</span>`:''}<span class="${color} font-bold tracking-wide">${l.message}</span></div>`;
+                        }
+                    });
+                    
+                    c.innerHTML = html;
+                    if(isAtBottom) c.scrollTop = c.scrollHeight;
+                }
+            } catch(e){}
+        }
+
+        // Logic
+        async function switchMode(uid, newMode) {
+            try {
+                const res = await fetch('/api/account/switch_mode', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({uid, mode: newMode}) });
+                const data = await res.json();
+                if(data.status === 'success') fetchStats();
+                else Toast.fire({icon: 'error', title: data.error});
+            } catch(e){}
+        }
+
+        async function togglePause(uid) {
+            await fetch('/api/account/pause', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({uid}) });
+            fetchStats();
+        }
+
+        async function deleteAcc(uid) {
+            if(userRole !== 'admin') return Toast.fire({icon:'error', title:'LOCKED 🔒 (Admin Only)'});
+            if(confirm(`Permanently delete UID ${uid}?`)) {
+                await fetch('/api/account/delete', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({uid}) });
+                closeModal('detailsModal');
+                fetchStats();
+            }
+        }
+
+        async function clearLogs() {
+            await fetch('/api/logs/clear', {method:'POST'});
+            document.getElementById('logs-container').innerHTML = '';
+        }
+
+        // Modals Fast Toggle
+        function openModal(id) { 
+            const m = document.getElementById(id);
+            m.classList.remove('hidden'); 
+            // Force reflow
+            void m.offsetWidth;
+            m.classList.add('active'); 
+        }
+        function closeModal(id) { 
+            const m = document.getElementById(id);
+            m.classList.remove('active');
+            setTimeout(() => m.classList.add('hidden'), 250); // Matches CSS transition
+        }
+
+        async function openDetails(uid, nick) {
+            document.getElementById('det-uid').innerText = uid;
+            document.getElementById('det-nick').innerText = nick || 'XIRUS 𝐘';
+            document.getElementById('det-content').innerHTML = '<div class="text-center py-4"><div class="loader-ring mx-auto"></div></div>';
+            openModal('detailsModal');
+
+            try {
+                const res = await fetch(`/api/account/settings/${uid}`);
+                const data = await res.json();
+                if(data.status === 'ok') {
+                    const t = new Date(data.created_at * 1000).toLocaleString();
+                    document.getElementById('det-content').innerHTML = `
+                        <div class="flex justify-between items-center border-b border-[#151b2b] pb-3"><span class="text-gray-500 uppercase">Pass:</span> <span class="font-mono text-[#00f0ff] bg-[#020306] px-2 py-1 rounded shadow-inner border border-[#151b2b]">${data.password||'Hidden'}</span></div>
+                        <div class="flex justify-between items-center border-b border-[#151b2b] py-3"><span class="text-gray-500 uppercase">Owner:</span> <span class="text-white">${data.owner}</span></div>
+                        <div class="flex justify-between items-center pt-3"><span class="text-gray-500 uppercase">Added:</span> <span class="text-[10px] text-[#ff0055]">${t}</span></div>
+                    `;
+                }
+            } catch(e) { document.getElementById('det-content').innerHTML = '<div class="text-[#ff0055] text-center">Data Error</div>'; }
+        }
+
+        async function submitAdd() {
+            if(userRole !== 'admin' && myUids.length >= 10) return Toast.fire({icon:'error', title:'MAX 10 𝐘 LIMIT 🔒'});
+            const uid = document.getElementById('add-uid').value, pwd = document.getElementById('add-pwd').value;
+            if(!uid || !pwd) return Toast.fire({icon:'warning', title:'Empty Fields'});
+            
+            const btn = document.getElementById('btnAddSubmit');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            try {
+                const res = await fetch('/api/account/add', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({uid, password:pwd}) });
+                const data = await res.json();
+                if(data.status==='success') { Toast.fire({icon:'success', title:'CONNECTED 𝐘'}); closeModal('addModal'); document.getElementById('add-uid').value=''; document.getElementById('add-pwd').value=''; fetchStats(); } 
+                else Toast.fire({icon:'error', title:data.error||data.message});
+            } finally { btn.innerHTML = 'ADD 𝐘'; }
+        }
+
+        async function submitBulkJson() {
+            if(userRole !== 'admin') return Toast.fire({icon:'error', title:'Admin Locked 🔒'});
+            const file = document.getElementById('json-upload').files[0];
+            if(!file) return Toast.fire({icon:'warning', title:'Choose JSON ʏ'});
+            
+            const btn = document.getElementById('btnBulkSubmit');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            try {
+                let fd = new FormData(); fd.append('file', file);
+                const res = await fetch('/api/accounts/bulk_upload', { method:'POST', body:fd });
+                const data = await res.json();
+                if(data.status==='success') { Toast.fire({icon:'success', title:`IMPORTED ${data.added} ʏ`}); closeModal('bulkModal'); document.getElementById('json-upload').value = ''; document.getElementById('file-name').innerText = 'No file chosen'; fetchStats(); } 
+                else Toast.fire({icon:'error', title:data.error||data.message});
+            } finally { btn.innerHTML = 'START IMPORT'; }
+        }
+
+        async function logout() { await fetch('/api/logout', {method:'POST'}); window.location.href='/login'; }
+        window.onload = init;
+    </script>
+</body>
+</html>

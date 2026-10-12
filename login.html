@@ -1,0 +1,777 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08060e">
+<title>XIRUS MODZ | Secure Access</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<style>
+:root{
+    color-scheme:dark;
+    --bg:#08060e;
+    --panel:#100d19;
+    --panel2:#151020;
+    --border:#292139;
+    --purple:#a855f7;
+    --violet:#7c3aed;
+    --soft:#d8b4fe;
+    --text:#f5f1ff;
+    --muted:#827991;
+    --green:#86efac;
+    --red:#fca5a5;
+}
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Inter,sans-serif;
+    -webkit-tap-highlight-color:transparent;
+}
+html{min-height:100%;background:var(--bg)}
+body{
+    min-height:100vh;
+    min-height:100dvh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:24px 18px;
+    overflow-x:hidden;
+    color:var(--text);
+    background:
+        radial-gradient(ellipse at 15% 5%,rgba(168,85,247,.13),transparent 36%),
+        radial-gradient(ellipse at 90% 95%,rgba(124,58,237,.12),transparent 38%),
+        var(--bg);
+}
+button,input{font:inherit}
+button{touch-action:manipulation}
+button:focus-visible,input:focus-visible{
+    outline:2px solid var(--soft);
+    outline-offset:3px;
+}
+
+/* Background */
+.ambient{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:0;
+}
+.grid{
+    position:absolute;
+    inset:0;
+    opacity:.23;
+    background-image:
+        linear-gradient(rgba(168,85,247,.055) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(168,85,247,.055) 1px,transparent 1px);
+    background-size:42px 42px;
+    mask-image:radial-gradient(ellipse at center,#000 5%,transparent 78%);
+}
+.orb{
+    position:absolute;
+    width:300px;
+    height:300px;
+    border-radius:50%;
+    filter:blur(95px);
+    opacity:.13;
+    will-change:transform;
+    animation:float 14s ease-in-out infinite alternate;
+}
+.orb.one{background:#a855f7;top:-160px;left:-130px}
+.orb.two{
+    width:340px;height:340px;
+    background:#6d28d9;
+    bottom:-200px;right:-140px;
+    animation-delay:-7s;
+}
+@keyframes float{
+    from{transform:translate3d(0,0,0)}
+    to{transform:translate3d(35px,25px,0)}
+}
+
+/* Main card */
+.login-card{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-width:410px;
+    padding:34px 30px 24px;
+    border:1px solid rgba(192,132,252,.20);
+    border-radius:23px;
+    background:linear-gradient(145deg,rgba(23,18,34,.97),rgba(11,9,17,.98));
+    box-shadow:
+        0 28px 90px rgba(0,0,0,.5),
+        0 0 45px rgba(124,58,237,.055),
+        inset 0 1px 0 rgba(255,255,255,.035);
+    animation:card-in .55s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes card-in{
+    from{opacity:0;transform:translateY(16px) scale(.985)}
+    to{opacity:1;transform:translateY(0) scale(1)}
+}
+.top-line{
+    position:absolute;
+    top:-1px;
+    left:18%;
+    width:64%;
+    height:2px;
+    background:linear-gradient(90deg,transparent,var(--purple),var(--soft),transparent);
+    box-shadow:0 0 15px rgba(168,85,247,.6);
+}
+
+/* Branding */
+.brand{
+    display:flex;
+    align-items:center;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:28px;
+}
+.logo-wrap{
+    position:relative;
+    display:grid;
+    place-items:center;
+    width:66px;
+    height:66px;
+    border-radius:19px;
+    background:linear-gradient(145deg,#c084fc,#7c3aed 55%,#4c1d95);
+    box-shadow:0 8px 28px rgba(124,58,237,.25);
+}
+.logo-wrap:before{
+    content:"";
+    position:absolute;
+    inset:-4px;
+    border-radius:22px;
+    border:1px solid rgba(216,180,254,.25);
+}
+.logo-inner{
+    display:grid;
+    place-items:center;
+    width:58px;
+    height:58px;
+    border-radius:15px;
+    color:#f5eaff;
+    background:linear-gradient(145deg,#1a1227,#0b0912);
+    font-size:27px;
+}
+.brand-name{
+    font-size:24px;
+    font-weight:900;
+    letter-spacing:2px;
+}
+.brand-name span{
+    color:var(--soft);
+    text-shadow:0 0 22px rgba(168,85,247,.25);
+}
+.brand-sub{
+    color:var(--muted);
+    font:10px 'JetBrains Mono',monospace;
+    letter-spacing:2.2px;
+    text-align:center;
+    text-transform:uppercase;
+}
+.brand-rule{
+    width:48px;
+    height:2px;
+    margin-top:3px;
+    border-radius:10px;
+    background:linear-gradient(90deg,var(--violet),var(--soft));
+}
+
+/* Section heading */
+.heading{margin-bottom:20px}
+.heading h2{
+    font-size:18px;
+    font-weight:800;
+    letter-spacing:-.4px;
+    margin-bottom:6px;
+}
+.heading p{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* Tabs */
+.tabs{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:5px;
+    padding:4px;
+    border:1px solid var(--border);
+    background:#0b0911;
+    border-radius:12px;
+    margin-bottom:23px;
+}
+.tab{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:42px;
+    border:1px solid transparent;
+    border-radius:9px;
+    background:transparent;
+    color:var(--muted);
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.8px;
+    cursor:pointer;
+    transition:background .2s,color .2s,border-color .2s;
+}
+.tab.active{
+    color:#f5eaff;
+    background:linear-gradient(135deg,rgba(168,85,247,.19),rgba(124,58,237,.09));
+    border-color:rgba(192,132,252,.25);
+}
+.tab.active i{color:var(--soft)}
+
+/* Forms */
+.form-section{display:none}
+.form-section.active{
+    display:block;
+    animation:section-in .22s ease both;
+}
+@keyframes section-in{
+    from{opacity:0;transform:translateY(5px)}
+    to{opacity:1;transform:translateY(0)}
+}
+.field{margin-bottom:16px}
+.field-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:8px;
+}
+.field label{
+    color:#b9afca;
+    font:700 10px 'JetBrains Mono',monospace;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+}
+.field-icon{
+    color:#766986;
+    position:absolute;
+    top:50%;
+    left:15px;
+    transform:translateY(-50%);
+    font-size:13px;
+    pointer-events:none;
+    transition:color .2s;
+}
+.input-wrap{position:relative}
+.input-wrap input{
+    display:block;
+    width:100%;
+    height:48px;
+    padding:0 44px 0 43px;
+    border:1px solid #2a2238;
+    border-radius:11px;
+    background:#0b0912;
+    color:var(--text);
+    outline:none;
+    font:12px 'JetBrains Mono',monospace;
+    transition:border-color .2s,background .2s,box-shadow .2s;
+}
+.input-wrap input::placeholder{color:#554b63}
+.input-wrap input:focus{
+    border-color:#a855f7;
+    background:#100b19;
+    box-shadow:0 0 0 3px rgba(168,85,247,.09);
+}
+.input-wrap:focus-within .field-icon{color:var(--soft)}
+.password-toggle{
+    position:absolute;
+    top:50%;
+    right:7px;
+    transform:translateY(-50%);
+    display:grid;
+    place-items:center;
+    width:34px;
+    height:34px;
+    border:0;
+    border-radius:8px;
+    background:transparent;
+    color:#766986;
+    cursor:pointer;
+}
+.password-toggle:hover{color:var(--soft);background:#1a1425}
+
+/* Submit */
+.submit-btn{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    width:100%;
+    min-height:49px;
+    margin-top:7px;
+    padding:13px;
+    border:1px solid rgba(216,180,254,.28);
+    border-radius:12px;
+    background:linear-gradient(110deg,#a855f7,#7c3aed 65%,#6d28d9);
+    color:white;
+    box-shadow:0 7px 24px rgba(124,58,237,.22);
+    font:800 11px 'JetBrains Mono',monospace;
+    letter-spacing:1.4px;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:transform .18s,box-shadow .2s,opacity .2s;
+}
+.submit-btn:hover:not(:disabled){
+    transform:translateY(-1px);
+    box-shadow:0 10px 28px rgba(124,58,237,.34);
+}
+.submit-btn:active:not(:disabled){transform:scale(.99)}
+.submit-btn:disabled{opacity:.65;cursor:wait}
+.submit-btn i{font-size:13px}
+
+/* Messages */
+.message{
+    display:none;
+    align-items:flex-start;
+    gap:10px;
+    padding:12px;
+    margin-bottom:17px;
+    border-radius:10px;
+    font-size:11px;
+    line-height:1.6;
+    overflow-wrap:anywhere;
+}
+.message.show{display:flex;animation:section-in .2s ease}
+.message.error{
+    background:rgba(239,68,68,.07);
+    border:1px solid rgba(239,68,68,.22);
+    color:var(--red);
+}
+.message.success{
+    background:rgba(34,197,94,.07);
+    border:1px solid rgba(34,197,94,.22);
+    color:var(--green);
+}
+
+/* Footer */
+.footer{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    margin-top:24px;
+    padding-top:18px;
+    border-top:1px solid #251d32;
+    color:#71677e;
+    font:9px 'JetBrains Mono',monospace;
+    letter-spacing:1.3px;
+    text-align:center;
+    text-transform:uppercase;
+}
+.footer i{color:#b794f6;font-size:12px}
+.footer-dot{
+    width:5px;height:5px;border-radius:50%;
+    background:#a78bfa;
+    box-shadow:0 0 8px #a78bfa;
+}
+.version{
+    margin-top:12px;
+    color:#4e455b;
+    font:9px 'JetBrains Mono',monospace;
+    text-align:center;
+    letter-spacing:1px;
+}
+
+@media(max-width:420px){
+    body{padding:16px 13px}
+    .login-card{padding:28px 21px 22px;border-radius:19px}
+    .brand{margin-bottom:24px}
+    .brand-name{font-size:22px}
+    .heading h2{font-size:17px}
+}
+@media(max-height:720px){
+    body{align-items:flex-start}
+    .login-card{margin:auto 0;padding-top:25px;padding-bottom:20px}
+    .brand{gap:8px;margin-bottom:20px}
+    .logo-wrap{width:56px;height:56px;border-radius:16px}
+    .logo-inner{width:50px;height:50px;border-radius:13px;font-size:23px}
+    .tabs{margin-bottom:18px}
+    .field{margin-bottom:12px}
+    .footer{margin-top:18px;padding-top:14px}
+}
+@media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{
+        animation-duration:.01ms!important;
+        animation-iteration-count:1!important;
+        scroll-behavior:auto!important;
+        transition-duration:.01ms!important;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="ambient" aria-hidden="true">
+    <div class="grid"></div>
+    <div class="orb one"></div>
+    <div class="orb two"></div>
+</div>
+
+<main class="login-card">
+    <div class="top-line"></div>
+
+    <header class="brand">
+        <div class="logo-wrap">
+            <div class="logo-inner">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+        </div>
+        <div class="brand-name">XIRUS <span>MODZ</span></div>
+        <div class="brand-sub">Premium Dashboard Access</div>
+        <div class="brand-rule"></div>
+    </header>
+
+    <div class="heading">
+        <h2 id="headingTitle">Welcome back</h2>
+        <p id="headingSubtitle">Sign in to access your command center.</p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Account access">
+        <button type="button" class="tab active" id="tabLogin"
+                role="tab" aria-selected="true" aria-controls="formLogin"
+                onclick="switchTab('login')">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> LOGIN
+        </button>
+        <button type="button" class="tab" id="tabSignup"
+                role="tab" aria-selected="false" aria-controls="formSignup"
+                onclick="switchTab('signup')">
+            <i class="fa-solid fa-user-plus"></i> REGISTER
+        </button>
+    </div>
+
+    <div class="message error" id="errorBox" role="alert" aria-live="polite">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span id="errorText">Something went wrong.</span>
+    </div>
+
+    <div class="message success" id="successBox" role="status" aria-live="polite">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="successText">Success.</span>
+    </div>
+
+    <!-- LOGIN -->
+    <section class="form-section active" id="formLogin" role="tabpanel" aria-labelledby="tabLogin">
+        <form onsubmit="submitLogin(event)">
+            <div class="field">
+                <div class="field-head">
+                    <label for="login-username">Username</label>
+                </div>
+                <div class="input-wrap">
+                    <i class="fa-solid fa-user field-icon"></i>
+                    <input type="text" id="login-username"
+                           placeholder="Enter your username"
+                           autocomplete="username"
+                           maxlength="64" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="field-head">
+                    <label for="login-password">Password</label>
+                </div>
+                <div class="input-wrap">
+                    <i class="fa-solid fa-lock field-icon"></i>
+                    <input type="password" id="login-password"
+                           placeholder="Enter your password"
+                           autocomplete="current-password"
+                           maxlength="256" required>
+                    <button type="button" class="password-toggle"
+                            aria-label="Show password"
+                            aria-pressed="false"
+                            onclick="togglePassword('login-password',this)">
+                        <i class="fa-regular fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="loginBtn">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                <span>Sign In</span>
+            </button>
+        </form>
+    </section>
+
+    <!-- REGISTER -->
+    <section class="form-section" id="formSignup" role="tabpanel" aria-labelledby="tabSignup" hidden>
+        <form onsubmit="submitSignup(event)">
+            <div class="field">
+                <div class="field-head">
+                    <label for="signup-username">Username</label>
+                </div>
+                <div class="input-wrap">
+                    <i class="fa-solid fa-user-plus field-icon"></i>
+                    <input type="text" id="signup-username"
+                           placeholder="Choose a username"
+                           autocomplete="username"
+                           minlength="3" maxlength="32" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="field-head">
+                    <label for="signup-password">Password</label>
+                </div>
+                <div class="input-wrap">
+                    <i class="fa-solid fa-lock field-icon"></i>
+                    <input type="password" id="signup-password"
+                           placeholder="Create a password"
+                           autocomplete="new-password"
+                           minlength="5" maxlength="256" required>
+                    <button type="button" class="password-toggle"
+                            aria-label="Show password"
+                            aria-pressed="false"
+                            onclick="togglePassword('signup-password',this)">
+                        <i class="fa-regular fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="field-head">
+                    <label for="signup-confirm">Confirm Password</label>
+                </div>
+                <div class="input-wrap">
+                    <i class="fa-solid fa-shield-halved field-icon"></i>
+                    <input type="password" id="signup-confirm"
+                           placeholder="Repeat your password"
+                           autocomplete="new-password"
+                           minlength="5" maxlength="256" required>
+                    <button type="button" class="password-toggle"
+                            aria-label="Show password"
+                            aria-pressed="false"
+                            onclick="togglePassword('signup-confirm',this)">
+                        <i class="fa-regular fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="signupBtn">
+                <i class="fa-solid fa-user-plus"></i>
+                <span>Create Account</span>
+            </button>
+        </form>
+    </section>
+
+    <footer class="footer">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Secure Access</span>
+        <span class="footer-dot"></span>
+        <span>XIRUS MODZ</span>
+    </footer>
+
+    <div class="version">PREMIUM INTERFACE · V1.0</div>
+</main>
+
+<script>
+"use strict";
+
+let activeTab = "login";
+let requestInProgress = false;
+
+const $ = id => document.getElementById(id);
+
+function switchTab(which) {
+    if (requestInProgress || !["login", "signup"].includes(which)) return;
+
+    activeTab = which;
+
+    const login = which === "login";
+
+    $("tabLogin").classList.toggle("active", login);
+    $("tabSignup").classList.toggle("active", !login);
+
+    $("tabLogin").setAttribute("aria-selected", String(login));
+    $("tabSignup").setAttribute("aria-selected", String(!login));
+
+    $("formLogin").classList.toggle("active", login);
+    $("formSignup").classList.toggle("active", !login);
+
+    $("formLogin").hidden = !login;
+    $("formSignup").hidden = login;
+
+    $("headingTitle").textContent = login ? "Welcome back" : "Join XIRUS MODZ";
+    $("headingSubtitle").textContent = login
+        ? "Sign in to access your command center."
+        : "Create your account to get started.";
+
+    clearMessages();
+
+    const field = login ? $("login-username") : $("signup-username");
+    field.focus({ preventScroll: true });
+}
+
+function clearMessages() {
+    $("errorBox").classList.remove("show");
+    $("successBox").classList.remove("show");
+}
+
+function showError(message) {
+    $("errorText").textContent = String(message || "Something went wrong.");
+    $("successBox").classList.remove("show");
+    $("errorBox").classList.add("show");
+}
+
+function showSuccess(message) {
+    $("successText").textContent = String(message);
+    $("errorBox").classList.remove("show");
+    $("successBox").classList.add("show");
+}
+
+function togglePassword(id, button) {
+    const input = $(id);
+    const show = input.type === "password";
+
+    input.type = show ? "text" : "password";
+    button.setAttribute("aria-pressed", String(show));
+    button.setAttribute("aria-label", show ? "Hide password" : "Show password");
+    button.innerHTML = show
+        ? '<i class="fa-regular fa-eye-slash"></i>'
+        : '<i class="fa-regular fa-eye"></i>';
+}
+
+function setBusy(button, busy, text, icon) {
+    button.disabled = busy;
+    button.innerHTML = `<i class="fa-solid ${busy ? "fa-circle-notch fa-spin" : icon}"></i><span>${text}</span>`;
+}
+
+async function apiRequest(endpoint, payload) {
+    const response = await fetch(endpoint, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify(payload)
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok && (!data || !data.error)) {
+        throw new Error(response.status === 429
+            ? "Too many attempts. Please try again later."
+            : `Request failed (${response.status}).`);
+    }
+
+    if (!data) throw new Error("Invalid response from server.");
+
+    return data;
+}
+
+async function submitLogin(event) {
+    event.preventDefault();
+
+    if (requestInProgress) return;
+
+    const username = $("login-username").value.trim();
+    const password = $("login-password").value;
+
+    if (!username || !password) {
+        showError("Enter your username and password.");
+        return;
+    }
+
+    requestInProgress = true;
+    clearMessages();
+
+    const button = $("loginBtn");
+    setBusy(button, true, "Signing In...", "fa-arrow-right-to-bracket");
+
+    try {
+        const data = await apiRequest("/api/login", { username, password });
+
+        if (data.status !== "ok") {
+            showError(data.error || "Login failed. Check your credentials.");
+            return;
+        }
+
+        showSuccess("Access granted. Opening dashboard...");
+        button.innerHTML = '<i class="fa-solid fa-check"></i><span>Access Granted</span>';
+
+        window.location.replace("/");
+        return;
+    } catch (error) {
+        showError(error.message === "Failed to fetch"
+            ? "Server unavailable. Check your connection."
+            : error.message || "Unable to contact the server.");
+    } finally {
+        if (window.location.pathname !== "/") {
+            requestInProgress = false;
+            setBusy(button, false, "Sign In", "fa-arrow-right-to-bracket");
+        }
+    }
+}
+
+async function submitSignup(event) {
+    event.preventDefault();
+
+    if (requestInProgress) return;
+
+    const username = $("signup-username").value.trim();
+    const password = $("signup-password").value;
+    const confirm = $("signup-confirm").value;
+
+    if (username.length < 3) {
+        showError("Username must contain at least 3 characters.");
+        return;
+    }
+
+    if (password.length < 5) {
+        showError("Password must contain at least 5 characters.");
+        return;
+    }
+
+    if (password !== confirm) {
+        showError("Passwords do not match.");
+        $("signup-confirm").focus();
+        return;
+    }
+
+    requestInProgress = true;
+    clearMessages();
+
+    const button = $("signupBtn");
+    setBusy(button, true, "Creating Account...", "fa-user-plus");
+
+    try {
+        const data = await apiRequest("/api/signup", {
+            username,
+            password,
+            confirm
+        });
+
+        if (data.status !== "ok") {
+            showError(data.error || "Unable to create your account.");
+            return;
+        }
+
+        showSuccess("Account created. Opening dashboard...");
+        button.innerHTML = '<i class="fa-solid fa-check"></i><span>Account Created</span>';
+
+        window.location.replace("/");
+        return;
+    } catch (error) {
+        showError(error.message === "Failed to fetch"
+            ? "Server unavailable. Check your connection."
+            : error.message || "Unable to contact the server.");
+    } finally {
+        if (window.location.pathname !== "/") {
+            requestInProgress = false;
+            setBusy(button, false, "Create Account", "fa-user-plus");
+        }
+    }
+}
+</script>
+</body>
+</html>
