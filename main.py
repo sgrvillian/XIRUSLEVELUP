@@ -89,7 +89,7 @@ except Exception:
 
 # ==================== CONFIG ====================
 WEB_HOST = "0.0.0.0"
-WEB_PORT = int(os.environ.get("PORT", 20333))
+WEB_PORT = int(os.environ.get("PORT", 8080))
 ACCOUNTS_FILE = "accounts.json"
 STOPPED_FILE = "stopped_accounts.json"
 TOKEN_CACHE_FILE = "token_cache.json"
@@ -98,7 +98,7 @@ TOKEN_CACHE_TTL = 1200
 
 DEFAULT_OWNER = "admin"
 
-KEEP_ALIVE_URL = "https://xirusmodz-levelup.onrender.com/"
+KEEP_ALIVE_URL = "https://xirusmodz-levelup.railway.app/"
 INTERVAL = 60
 
 async def keep_alive():

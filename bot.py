@@ -10,7 +10,7 @@ from datetime import datetime
 import requests
 
 # ================= CONFIG =================
-PROJECT_DIR = Path("/storage/emulated/0/level9")
+PROJECT_DIR = Path("/Account lvl")
 
 # Set these environment variables in Termux before running.
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8944983211:AAFqePkbS-ecIs9P5pI7tJT_Y_h-T0g8J2Y").strip()
